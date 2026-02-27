@@ -323,25 +323,23 @@ short BinarySearchIndexStudentSurnameNameIter(IndexStudentSurnameName index[], s
         return -1; // точно не может быть такого индекса
 }
 
-//======================================== В ОТЧЁТЕ УЖЕ ЕСТЬ ==============================================================
-
-short BinarySearchIndexStudentRatingRec(IndexStudentRating index[], double rating) // будет искать рекурсивно
+short BinarySearchIndexStudentRatingRec(IndexStudentRating index[], int left, int right, double rating) // будет искать рекурсивно
 {
-    int left = 0;
-    int right = STUDENTS_NUMBER - 1;
-    
-    if (left > right) // база
+    if (left > right) // не нашли, вылет за границы
         return -1;
 
     int mid = left + (right - left) / 2;
 
     if (index[mid].rating < rating)
-       left = mid + 1;
+        return BinarySearchIndexStudentRatingRec(index, mid + 1, right, rating); // сдвинулись вправо
     else if (index[mid].rating > rating)
-       right = mid - 1;
-   else
-      return index[mid].originIndex; // нашли
+        return BinarySearchIndexStudentRatingRec(index, left, mid - 1, rating); // сдвинулись влево
+
+    return index[mid].originIndex; // нашли
 }
+
+
+//======================================== В ОТЧЁТЕ УЖЕ ЕСТЬ ==============================================================
 
 
 int main()
@@ -390,7 +388,7 @@ int main()
 
     int indexBinarySearch = BinarySearchIndexStudentSurnameNameIter(indexStudentSurnameName, surname, name);
     
-    if (indexBinarySearch == -1)
+    if (indexBinarySearch == -1 || students[indexBinarySearch].isRemoved)
         cout << "Элемент не найден";
     else
         cout << ToString(students[indexBinarySearch]);

@@ -94,7 +94,7 @@ double CalculateRating(Student stud) // вычисление рейтинга д
 
 string ToString(Student stud)
 {
-    return to_string(stud.number) + " " + stud.name + " " + stud.patronymic + " " + "Рейтинг: " + to_string(CalculateRating(stud)) + '\n';
+    return to_string(stud.number) + " " + stud.surname + " " + stud.name + " " + stud.patronymic + " " + "Рейтинг: " + to_string(CalculateRating(stud)) + '\n';
 }
 
 void PrintArrayConsole(Student studs[])
@@ -126,7 +126,7 @@ void PrintArrayFile(Student studs[]) // магия чистой воды. и с�
      {
         case 1:
         {
-            cout << "Как нужно назвать новый файл?"; // сам придумал так сделать. больше удобства
+            cout << "Как нужно назвать новый файл?\n"; // сам придумал так сделать. больше удобства
             cin >> fileName;
             fileName = fileName + ".txt";
             
@@ -320,18 +320,13 @@ int main()
         break;
     }
 
-    IndexStudentSurnameName indexStudentSurnameName[STUDENTS_NUMBER]; // индекс по фамилии и имени
-
-    MakeIndexStudentSurnameName(indexStudentSurnameName, students); // заполнили индекс
+    IndexStudentSurnameName indexStudentSurnameName[STUDENTS_NUMBER];
+    MakeIndexStudentSurnameName(indexStudentSurnameName, students);
 
     HoareSort(indexStudentSurnameName, 0, STUDENTS_NUMBER - 1);
-
-    PrintIndexStudentSurnameName(indexStudentSurnameName, students);
-    
-    
+    PrintIndexStudentSurnameName(indexStudentSurnameName, students); 
     
     IndexStudentRating indexStudentRating[STUDENTS_NUMBER];
-
     MakeIndexIndexStudentRating(indexStudentRating, students);
 
     

@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const unsigned char MARKS_NUMBER = 11; // число предметов для расчёта рейтинга
-const unsigned char STUDENTS_NUMBER = 11; // ограничение на число студентов
+const unsigned char MARKS_NUMBER = 2; // число предметов для расчёта рейтинга
+const unsigned char STUDENTS_NUMBER = 2; // ограничение на число студентов
 
 struct Student // описание студента
 {
@@ -65,6 +65,7 @@ void MakeArray(Student studs[]) // ручное создание массива
     for (int p = 0; p < STUDENTS_NUMBER; p++)
     {
         studs[p].number = p + 1;
+        studs[p].isRemoved = false;
 
         cout << "Введите имя студента\n";
         cin >> studs[p].name;
@@ -228,6 +229,8 @@ void ReadArray(Student studs[])
         stringstream ss(line); // создаёт какой-то строковый поток, чтобы эту самую строку делить по разделителям. сложно
         string token; // читаемый объект
 
+        studs[studentIndex].isRemoved = false;
+
         getline(ss, token, '|'); // номер
         studs[studentIndex].number = stoi(token); // видимо что-то вроде конверт или парс
 
@@ -338,8 +341,34 @@ short BinarySearchIndexStudentRatingRec(IndexStudentRating index[], int left, in
     return index[mid].originIndex; // нашли
 }
 
+void BubbleSort(IndexStudentRating index[]) // для сортировки по рейтингу
+{
+    for (int i = 0; i < STUDENTS_NUMBER - 1; i++)
+    {
+        for (int j = 0; j < STUDENTS_NUMBER - i - 1; j++)
+        {
+            if (index[j].rating > index[j + 1].rating) // по возрастанию
+            {
+                // Меняем местами
+                IndexStudentRating temp = index[j];
+                index[j] = index[j + 1];
+                index[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void RemoveStudent(Student studs[], double rating) // будем удалять по рейтингу, будто бы отчислили. вроде бы логично
+{
+    for (int p = 0; p < STUDENTS_NUMBER; p++)
+    {
+        if (!studs[p].isRemoved && CalculateRating(studs[p]) == rating)
+            studs[p].isRemoved = true;
+    }
+}
 
 //======================================== В ОТЧЁТЕ УЖЕ ЕСТЬ ==============================================================
+
 
 
 int main()
@@ -386,13 +415,30 @@ int main()
     cout << "Введите имя для поиска\n";
     cin >> name;
 
-    int indexBinarySearch = BinarySearchIndexStudentSurnameNameIter(indexStudentSurnameName, surname, name);
+    int indexBinarySearchIter = BinarySearchIndexStudentSurnameNameIter(indexStudentSurnameName, surname, name);
     
-    if (indexBinarySearch == -1 || students[indexBinarySearch].isRemoved)
+    if (indexBinarySearchIter == -1 || students[indexBinarySearchIter].isRemoved)
         cout << "Элемент не найден";
     else
-        cout << ToString(students[indexBinarySearch]);
+        cout << ToString(students[indexBinarySearchIter]);
     
+    BubbleSort(indexStudentRating); 
+    
+    double rating;
+    cout << "Введите рейтинг для поиска\n";
+    cin >> rating;
+
+    int indexBinarySearchRec = BinarySearchIndexStudentRatingRec(indexStudentRating, 0, STUDENTS_NUMBER - 1, rating);
+
+    if (indexBinarySearchRec == -1 || students[indexBinarySearchRec].isRemoved)
+        cout << "Элемент не найден";
+    else
+        cout << ToString(students[indexBinarySearchRec]);
+
+    double removeRating;
+    cout << "Введите рейтинг для удаления\n";
+    cin >> removeRating;
+    RemoveStudent(students, removeRating)
 
     
 

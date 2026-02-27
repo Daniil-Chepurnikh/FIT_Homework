@@ -180,16 +180,16 @@ int Partition(IndexStudentSurnameName array[], int left, int right) // я над
     {
         while (high >= low && // условие осталось
               (array[low].surname < pivot.surname || // если влетели в неравенство фамилий всё сразу круто
-              array[low].surname == pivot.surname && // если фамилии совпали :( то 
-              array[low].name < pivot.name)) // проверяем имена
+              (array[low].surname == pivot.surname && // если фамилии совпали :( то 
+              array[low].name < pivot.name))) // проверяем имена
         {
             low++;
         }
 
         while (high >= low && // см выше но только для больших элементов соответственно
               (array[high].surname >= pivot.surname ||
-              array[high].surname == pivot.surname &&
-              array[high].name > pivot.name))
+              (array[high].surname == pivot.surname &&
+              array[high].name > pivot.name)))
         {
             high--;
         }
@@ -204,7 +204,7 @@ int Partition(IndexStudentSurnameName array[], int left, int right) // я над
 
 int main()
 {
-    setlocale(LC_ALL, "ru_RU.UTF - 8"); // была какая-то жесть с выводом и товарищ интернет сказал сделать так
+    setlocale(LC_ALL, "ru_RU.UTF-8"); // была какая-то жесть с выводом и товарищ интернет сказал сделать так
     system("chcp 65001"); // чтобы писались нормальные русские слова
 
     

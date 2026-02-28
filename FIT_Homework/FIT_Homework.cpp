@@ -10,7 +10,7 @@ using namespace std;
 const unsigned char MARKS_NUMBER = 3; // число предметов для расчёта рейтинга
 const unsigned char STUDENTS_NUMBER = 1; // ограничение на число студентов
 
-unsigned char removed = 0;
+unsigned char removed = 0; // сколько было удалено
 
 struct Student // описание студента
 {
@@ -373,10 +373,10 @@ void RemoveStudent(Student studs[], double rating) // будем удалять 
 
 void UpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[], int newSize)
 {
-    int activeIndex = 0; 
+    int activeIndex = 0; // активные студенты в начало
     for (int q = 0; q < STUDENTS_NUMBER && activeIndex < newSize; q++)
     {
-        if (!studs[q].isRemoved)
+        if (!studs[q].isRemoved) // не работаем с удалёнными
         {
             indexSurname[activeIndex].originIndex = q;
             indexSurname[activeIndex].surname = studs[q].surname;

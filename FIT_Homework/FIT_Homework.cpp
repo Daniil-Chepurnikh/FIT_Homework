@@ -7,8 +7,10 @@
 
 using namespace std;
 
-const unsigned char MARKS_NUMBER = 2; // число предметов для расчёта рейтинга
-const unsigned char STUDENTS_NUMBER = 2; // ограничение на число студентов
+const unsigned char MARKS_NUMBER = 11; // число предметов для расчёта рейтинга
+const unsigned char STUDENTS_NUMBER = 11; // ограничение на число студентов
+
+unsigned char removed = 0;
 
 struct Student // описание студента
 {
@@ -18,7 +20,7 @@ struct Student // описание студента
     string surname; // фамилия
     string patronymic; // отчество
 
-    bool isRemoved;
+    bool isRemoved; // метка удаления
 
     unsigned char marks[MARKS_NUMBER]; // перечень оценок для расчёта рейтинга
 };
@@ -76,7 +78,7 @@ void MakeArray(Student studs[]) // ручное создание массива
         cout << "Введите отчество студента\n";
         cin >> studs[p].patronymic;
 
-        for (int q = 0; q < MARKS_NUMBER; q++)
+        for (int q = 0; q < MARKS_NUMBER; q++) // число от 1 до 10 точно войдёт в чар и незачем усложнять
         {
             studs[p].marks[q] = InputNumber("Введите оценку за предмет\n", "Вы не ввели целое число в допустимом диапазоне от 1 до 10\n", 1, 10);
         }
@@ -341,16 +343,15 @@ short BinarySearchIndexStudentRatingRec(IndexStudentRating index[], int left, in
     return index[mid].originIndex; // нашли
 }
 
-void BubbleSort(IndexStudentRating index[]) // для сортировки по рейтингу
+void BubbleSort(IndexStudentRating index[], int len) // для сортировки по рейтингу
 {
-    for (int i = 0; i < STUDENTS_NUMBER - 1; i++)
+    for (int i = 0; i < len - 1; i++)
     {
-        for (int j = 0; j < STUDENTS_NUMBER - i - 1; j++)
+        for (int j = 0; j < len - i - 1; j++)
         {
             if (index[j].rating > index[j + 1].rating) // по возрастанию
             {
-                // Меняем местами
-                IndexStudentRating temp = index[j];
+                IndexStudentRating temp = index[j]; // меняем местами
                 index[j] = index[j + 1];
                 index[j + 1] = temp;
             }
@@ -365,11 +366,42 @@ void RemoveStudent(Student studs[], double rating) // будем удалять 
         if (!studs[p].isRemoved && CalculateRating(studs[p]) == rating)
             studs[p].isRemoved = true;
     }
+
+    removed++;
 }
 
 //======================================== В ОТЧЁТЕ УЖЕ ЕСТЬ ==============================================================
 
+int PhysicalRemoveStudentsAndUpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[]) // с большой помощью железного друга
+{
+    int newSize = 0;
 
+    for (int q = 0; q < STUDENTS_NUMBER; q++) // сдвигаем всех неудалённых в начало массива
+    {
+        if (!studs[q].isRemoved) // если не удалён
+        {
+            if (q != newSize) // чтобы не делать лишнего
+                studs[newSize] = studs[q]; // на новое место
+
+            newSize++;
+        }
+    }
+
+    for (int q = 0; q < newSize; q++) // здесь вроде понятно было
+    {
+        indexSurname[q].originIndex = q;
+        indexSurname[q].surname = studs[q].surname;
+        indexSurname[q].name = studs[q].name;
+
+        indexRating[q].originIndex = q;
+        indexRating[q].rating = CalculateRating(studs[q]);
+    }
+
+    HoareSort(indexSurname, 0, newSize - 1); // сортируем индексы заново
+    BubbleSort(indexRating, newSize); // нужно передавать размер
+
+    return newSize; // чтобы двигаться только по неудалённым студентам в других функциях
+}
 
 int main()
 {
@@ -377,24 +409,24 @@ int main()
     system("chcp 65001"); // чтобы писались нормальные русские слова
 
     Student students[STUDENTS_NUMBER]; // исходник
-    
+
     switch (GetMenuAction("Создать массив самостоятельно", "Прочитать массив из файла", "Выберете каким способом заполнить массив"))
     {
-        case 1:
-            MakeArray(students);
-            break;
-        case 2: 
-            ReadArray(students);
+    case 1:
+        MakeArray(students);
+        break;
+    case 2:
+        ReadArray(students);
         break;
     }
 
     switch (GetMenuAction("Напечатать массив в консоль", "Напечатать массив в файл", "Выберете каким способом напечатать массив"))
     {
-        case 1:
-            PrintArrayConsole(students);
+    case 1:
+        PrintArrayConsole(students);
         break;
-        case 2:
-            PrintArrayFile(students);
+    case 2:
+        PrintArrayFile(students);
         break;
     }
 
@@ -402,12 +434,12 @@ int main()
     MakeIndexStudentSurnameName(indexStudentSurnameName, students);
 
     HoareSort(indexStudentSurnameName, 0, STUDENTS_NUMBER - 1);
-    PrintIndexStudentSurnameName(indexStudentSurnameName, students); 
-    
+    PrintIndexStudentSurnameName(indexStudentSurnameName, students);
+
     IndexStudentRating indexStudentRating[STUDENTS_NUMBER];
     MakeIndexIndexStudentRating(indexStudentRating, students);
 
-    string surname;   
+    string surname;
     cout << "Введите фамилию для поиска\n";
     cin >> surname;
 
@@ -416,14 +448,14 @@ int main()
     cin >> name;
 
     int indexBinarySearchIter = BinarySearchIndexStudentSurnameNameIter(indexStudentSurnameName, surname, name);
-    
+
     if (indexBinarySearchIter == -1 || students[indexBinarySearchIter].isRemoved)
         cout << "Элемент не найден";
     else
         cout << ToString(students[indexBinarySearchIter]);
-    
-    BubbleSort(indexStudentRating); 
-    
+
+    BubbleSort(indexStudentRating, STUDENTS_NUMBER);
+
     double rating;
     cout << "Введите рейтинг для поиска\n";
     cin >> rating;
@@ -435,10 +467,28 @@ int main()
     else
         cout << ToString(students[indexBinarySearchRec]);
 
-    double removeRating;
-    cout << "Введите рейтинг для удаления\n";
-    cin >> removeRating;
-    RemoveStudent(students, removeRating)
+    
+    int removeStudents;
+    cout << "Введите количество рейтингов для удаления(если студент = рейтинг, то это количество студентов для удаления\n";
+    cin >> removeStudents;
+    
+    if (removeStudents > STUDENTS_NUMBER - removed)
+        cout << "Недостаточно студентов для удаления";
+    else
+    {
+        for (int p = 0; p < removeStudents; p++) // попробоавать несколько убрать, чтобы возможно пришлось перестроить индексы
+        {
+            double removeRating;
+            cout << "Введите рейтинг для удаления\n";
+            cin >> removeRating;
+            RemoveStudent(students, removeRating);
+        }
+    }
+
+    if (removed == STUDENTS_NUMBER / 2) // зачем перестравивать если данные очень близки к актуальным
+        PhysicalRemoveStudentsAndUpdateIndex(students, indexStudentSurnameName, indexStudentRating);
+    else
+        cout << "Данные позволяют не перестраивать индексы";
 
     
 

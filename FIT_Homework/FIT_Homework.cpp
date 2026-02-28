@@ -373,12 +373,12 @@ void RemoveStudent(Student studs[], double rating) // будем удалять 
 
 void UpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[], int newSize)
 {
-    int activeIndex = 0; // НУЖЕН ОТДЕЛЬНЫЙ СЧЁТЧИК
-    for (int q = 0; q < STUDENTS_NUMBER && activeIndex < newSize; q++) // ПРОХОДИМ ПО ВСЕМ СТУДЕНТАМ
+    int activeIndex = 0; 
+    for (int q = 0; q < STUDENTS_NUMBER && activeIndex < newSize; q++)
     {
-        if (!studs[q].isRemoved) // ПРОВЕРЯЕМ, ЧТО НЕ УДАЛЁН
+        if (!studs[q].isRemoved)
         {
-            indexSurname[activeIndex].originIndex = q; // ИСПОЛЬЗУЕМ q, А НЕ activeIndex
+            indexSurname[activeIndex].originIndex = q;
             indexSurname[activeIndex].surname = studs[q].surname;
             indexSurname[activeIndex].name = studs[q].name;
 
@@ -548,7 +548,10 @@ int main()
         }
 
         if (removed >= STUDENTS_NUMBER / 2 && removed > 0) // зачем перестравивать если данные очень близки к актуальным
+        {
             PhysicalRemoveStudentsAndUpdateIndex(students, indexStudentSurnameName, indexStudentRating);
+            removed = 0; // чтобы сделать так что мы реально обновились у нас все актуальные и никто не помечен удалённым
+        }
         else
             cout << "Данные позволяют не перестраивать индексы";
 

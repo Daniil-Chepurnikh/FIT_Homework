@@ -347,7 +347,7 @@ void BubbleSort(IndexStudentRating index[], int len) // для сортиров�
     {
         for (int j = 0; j < len - i - 1; j++)
         {
-            if (index[j].rating > index[j + 1].rating) // по возрастанию
+            if (index[j + 1].rating < index[j].rating) // по убыванию
             {
                 IndexStudentRating temp = index[j]; // меняем местами
                 index[j] = index[j + 1];

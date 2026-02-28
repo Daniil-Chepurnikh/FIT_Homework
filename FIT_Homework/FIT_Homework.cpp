@@ -424,9 +424,9 @@ void ReinstateStudent(Student studs[], double rating) // восстановле�
 
 void EditStudentAndUpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[], int index)
 {
-    // страшнее чем удаление из-за изменения ключей
+    // страшнее чем удаление из-за изменения ключей. очень тяжело на уставшего человека
     
-    if (index < 0 || index >= STUDENTS_NUMBER || studs[index].isRemoved)
+    if (index < 0 || index >= STUDENTS_NUMBER || studs[index].isRemoved) // не работать по ошибкам
     {
         cout << "Некорректный индекс или студент удалён\n";
         return;

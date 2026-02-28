@@ -301,7 +301,6 @@ short BinarySearchIndexStudentSurnameNameIter(IndexStudentSurnameName index[], s
 {
     int left = 0;
     int right = STUDENTS_NUMBER - 1;
-    bool isFound = false; // на случай если не найдём
     while (left <= right)
     {
         int mid = left + (right - left) / 2;
@@ -324,8 +323,7 @@ short BinarySearchIndexStudentSurnameNameIter(IndexStudentSurnameName index[], s
             }
         }
     }
-    if (!isFound) // либо вышли по return внутри цикла либо не нашли
-        return -1; // точно не может быть такого индекса
+    return -1; // точно не может быть такого индекса
 }
 
 short BinarySearchIndexStudentRatingRec(IndexStudentRating index[], int left, int right, double rating) // будет искать рекурсивно

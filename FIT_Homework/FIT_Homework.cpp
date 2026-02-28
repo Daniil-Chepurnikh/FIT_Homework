@@ -1,4 +1,4 @@
-// Тяжело. Работа идёт последовательно. Иногда используется меню. Для новых действи с с новым массивом надо перезапускаться
+// Тяжело. Работа идёт последовательно. Иногда используется меню
 
 #include <iostream>
 #include <fstream>
@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const unsigned char MARKS_NUMBER = 11; // число предметов для расчёта рейтинга
-const unsigned char STUDENTS_NUMBER = 11; // ограничение на число студентов
+const unsigned char MARKS_NUMBER = 3; // число предметов для расчёта рейтинга
+const unsigned char STUDENTS_NUMBER = 1; // ограничение на число студентов
 
 unsigned char removed = 0;
 
@@ -364,13 +364,32 @@ void RemoveStudent(Student studs[], double rating) // будем удалять 
     for (int p = 0; p < STUDENTS_NUMBER; p++)
     {
         if (!studs[p].isRemoved && CalculateRating(studs[p]) == rating)
+        {
             studs[p].isRemoved = true;
+            removed++;
+        }
     }
-
-    removed++;
 }
 
-//======================================== В ОТЧЁТЕ УЖЕ ЕСТЬ ==============================================================
+void UpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[], int newSize)
+{
+    int activeIndex = 0; // НУЖЕН ОТДЕЛЬНЫЙ СЧЁТЧИК
+    for (int q = 0; q < STUDENTS_NUMBER && activeIndex < newSize; q++) // ПРОХОДИМ ПО ВСЕМ СТУДЕНТАМ
+    {
+        if (!studs[q].isRemoved) // ПРОВЕРЯЕМ, ЧТО НЕ УДАЛЁН
+        {
+            indexSurname[activeIndex].originIndex = q; // ИСПОЛЬЗУЕМ q, А НЕ activeIndex
+            indexSurname[activeIndex].surname = studs[q].surname;
+            indexSurname[activeIndex].name = studs[q].name;
+
+            indexRating[activeIndex].originIndex = q;
+            indexRating[activeIndex].rating = CalculateRating(studs[q]);
+            activeIndex++;
+        }
+    }
+    HoareSort(indexSurname, 0, newSize - 1);
+    BubbleSort(indexRating, newSize);
+}
 
 int PhysicalRemoveStudentsAndUpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[]) // с большой помощью железного друга
 {
@@ -386,22 +405,64 @@ int PhysicalRemoveStudentsAndUpdateIndex(Student studs[], IndexStudentSurnameNam
             newSize++;
         }
     }
+    UpdateIndex(studs, indexSurname, indexRating, newSize);
 
-    for (int q = 0; q < newSize; q++) // здесь вроде понятно было
-    {
-        indexSurname[q].originIndex = q;
-        indexSurname[q].surname = studs[q].surname;
-        indexSurname[q].name = studs[q].name;
-
-        indexRating[q].originIndex = q;
-        indexRating[q].rating = CalculateRating(studs[q]);
-    }
-    HoareSort(indexSurname, 0, newSize - 1); // сортируем индексы заново
-    BubbleSort(indexRating, newSize); // по нужному размеру
     return newSize; // чтобы двигаться только по неудалённым студентам в других функциях
 }
 
+void ReinstateStudent(Student studs[], double rating) // восстановление
+{
+    for (int p = 0; p < STUDENTS_NUMBER; p++)
+    {
+        if (studs[p].isRemoved && CalculateRating(studs[p]) == rating)
+        {
+            studs[p].isRemoved = false;
+            removed--;
+        }
+    }
+}
 
+void EditStudentAndUpdateIndex(Student studs[], IndexStudentSurnameName indexSurname[], IndexStudentRating indexRating[], int index)
+{
+    // страшнее чем удаление из-за изменения ключей
+    
+    if (index < 0 || index >= STUDENTS_NUMBER || studs[index].isRemoved)
+    {
+        cout << "Некорректный индекс или студент удалён\n";
+        return;
+    }
+
+    cout << "Редактирование студента:\n";
+    cout << ToString(studs[index]);
+
+    // персональные данные
+    cout << "Введите новое имя: ";
+    cin >> studs[index].name;
+
+    cout << "Введите новую фамилию: ";
+    cin >> studs[index].surname;
+
+    cout << "Введите новое отчество: ";
+    cin >> studs[index].patronymic;
+
+    // оценки
+    for (int q = 0; q < MARKS_NUMBER; q++)
+    {
+        studs[index].marks[q] = InputNumber("Введите новую оценку: ", "Вы не ввели целое число в допустимом диапазоне от 1 до 10\n", 1, 10);
+    }
+
+    int activeCount = 0;
+    for (int p = 0; p < STUDENTS_NUMBER; p++) // считает количество активных студентов
+    {
+        if (!studs[p].isRemoved)
+            activeCount++;
+    }
+
+    UpdateIndex(studs, indexSurname, indexRating, activeCount);
+
+    cout << "Студент отредактирован:\n";
+    cout << ToString(studs[index]);
+}
 
 int main()
 {
@@ -454,8 +515,8 @@ int main()
             cout << ToString(students[indexBinarySearchIter]);
 
         MakeIndexIndexStudentRating(indexStudentRating, students);
-        PrintIndexStudentRating(indexStudentRating, students);
         BubbleSort(indexStudentRating, STUDENTS_NUMBER);
+        PrintIndexStudentRating(indexStudentRating, students);
 
         double rating;
         cout << "Введите рейтинг для поиска\n";
@@ -486,15 +547,35 @@ int main()
             }
         }
 
-        if (removed == STUDENTS_NUMBER / 2) // зачем перестравивать если данные очень близки к актуальным
+        if (removed >= STUDENTS_NUMBER / 2 && removed > 0) // зачем перестравивать если данные очень близки к актуальным
             PhysicalRemoveStudentsAndUpdateIndex(students, indexStudentSurnameName, indexStudentRating);
         else
             cout << "Данные позволяют не перестраивать индексы";
 
+        int reinstateStudents;
+        cout << "Введите количество рейтингов для восстановления(если студент = рейтинг, то это количество студентов для восстановления\n";
+        cin >> reinstateStudents;
 
+        if (reinstateStudents > removed)
+            cout << "Недостаточно студентов для восстановления";
+        else
+        {
+            for (int p = 0; p < reinstateStudents; p++)
+            {
+                double reinstateRating;
+                cout << "Введите рейтинг для восстановления\n";
+                cin >> reinstateRating;
+                ReinstateStudent(students, reinstateRating);
+            }
+        }
 
-
-
+        if (GetMenuAction("Да", "Нет", "Хотите отредактировать студента?") == 1)
+        {
+            int studentNumber;
+            cout << "Введите номер студента для редактирования: ";
+            cin >> studentNumber;
+            EditStudentAndUpdateIndex(students, indexStudentSurnameName, indexStudentRating, studentNumber - 1);
+        }
     }
     return 0;
 }

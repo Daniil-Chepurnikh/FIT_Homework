@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const unsigned char MARKS_NUMBER = 3; // число предметов для расчёта рейтинга
-const unsigned char STUDENTS_NUMBER = 1; // ограничение на число студентов
+const unsigned char MARKS_NUMBER = 11; // число предметов для расчёта рейтинга
+const unsigned char STUDENTS_NUMBER = 11; // ограничение на число студентов
 
 unsigned char removed = 0; // сколько было удалено
 

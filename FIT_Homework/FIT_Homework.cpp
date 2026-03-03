@@ -7,8 +7,8 @@
 
 using namespace std;
 
-const unsigned char MARKS_NUMBER = 11; // число предметов для расчёта рейтинга
-const unsigned char STUDENTS_NUMBER = 11; // ограничение на число студентов
+const unsigned char MARKS_NUMBER = 3; // число предметов для расчёта рейтинга
+const unsigned char STUDENTS_NUMBER = 1; // ограничение на число студентов
 
 unsigned char removed = 0; // сколько было удалено
 
@@ -312,7 +312,7 @@ short BinarySearchIndexStudentSurnameNameIter(IndexStudentSurnameName index[], s
         else // фамилии совпали
         {
             // действительно мид может влететь во что-то похоже на индекс вне границ массива
-            while (mid > 0 && mid < STUDENTS_NUMBER && index[mid].surname == surname) // значит как говорила Л.Н. на паре идём в разные стороны пока фамилия совпадает и ищем имя
+            while (mid >= 0 && mid <= STUDENTS_NUMBER && index[mid].surname == surname) // значит как говорила Л.Н. на паре идём в разные стороны пока фамилия совпадает и ищем имя
             {
                 if (index[mid].name < name)
                     mid--; // на шаг влево
@@ -533,7 +533,7 @@ int main()
         cin >> removeStudents;
 
         if (removeStudents > STUDENTS_NUMBER - removed)
-            cout << "Недостаточно студентов для удаления";
+            cout << "Недостаточно студентов для удаления\n";
         else
         {
             for (int p = 0; p < removeStudents; p++) // попробоавать несколько убрать, чтобы возможно пришлось перестроить индексы
@@ -551,14 +551,14 @@ int main()
             removed = 0; // чтобы сделать так что мы реально обновились у нас все актуальные и никто не помечен удалённым
         }
         else
-            cout << "Данные позволяют не перестраивать индексы";
+            cout << "Данные позволяют не перестраивать индексы\n";
 
         int reinstateStudents;
-        cout << "Введите количество рейтингов для восстановления(если студент = рейтинг, то это количество студентов для восстановления\n";
+        cout << "Введите количество рейтингов для восстановления(если студент = рейтинг, то это количество студентов для восстановления)\n";
         cin >> reinstateStudents;
 
         if (reinstateStudents > removed)
-            cout << "Недостаточно студентов для восстановления";
+            cout << "Недостаточно студентов для восстановления\n";
         else
         {
             for (int p = 0; p < reinstateStudents; p++)

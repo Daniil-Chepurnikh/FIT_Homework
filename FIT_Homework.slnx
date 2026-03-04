@@ -4,4 +4,5 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="FIT_Homework/FIT_Homework.vcxproj" Id="00f818f4-2972-4c1a-8efd-1e15bbeff520" />
+  <Project Path="FIT_Homework2/FIT_Homework2.vcxproj" Id="e1ec93c7-6a76-4696-ba3d-906aa30173a4" />
 </Solution>

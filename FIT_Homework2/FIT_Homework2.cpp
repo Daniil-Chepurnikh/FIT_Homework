@@ -374,11 +374,10 @@ IndexStudentSurname* MakeIndexSurname(Student studs[], int size) // Старым
     return rootSurname;
 }
 
-void ClearTrees(IndexStudentSurname*& rootSurname, IndexStudentRating*& rootRating)
+void UpdateIndex(Student studs[], IndexStudentSurname*& rootSurname, IndexStudentRating*& rootRating, int newSize)
 {
-    ClearAllNodesSurname(rootSurname); // запускаем рекурсивный алгоритм обхода вершин
-    ClearAllNodesRating(rootRating);
-    return;
+    rootRating = MakeIndexRating(studs, newSize);
+    rootSurname = MakeIndexSurname(studs, newSize);
 }
 
 void ClearAllNodesSurname(IndexStudentSurname*& rootSurname)
@@ -415,6 +414,13 @@ void ClearAllNodesRating(IndexStudentRating*& rootRating)
     }
 }
 
+void ClearTrees(IndexStudentSurname*& rootSurname, IndexStudentRating*& rootRating)
+{
+    ClearAllNodesSurname(rootSurname); // запускаем рекурсивный алгоритм обхода вершин
+    ClearAllNodesRating(rootRating);
+    return;
+}
+
 int PhysicalRemoveStudentsAndUpdateIndex(Student studs[], IndexStudentSurname*& rootSurname, IndexStudentRating*& rootRating)
 {
     int newSize = 0;
@@ -432,12 +438,6 @@ int PhysicalRemoveStudentsAndUpdateIndex(Student studs[], IndexStudentSurname*& 
 
     removed = 0;
     return newSize;
-}
-
-void UpdateIndex(Student studs[], IndexStudentSurname*& rootSurname, IndexStudentRating*& rootRating, int newSize)
-{
-    rootRating = MakeIndexRating(studs, newSize);
-    rootSurname = MakeIndexSurname(studs, newSize);
 }
 
 void EditStudentAndUpdateIndex(Student studs[], IndexStudentSurname*& rootSurname, IndexStudentRating*& rootRating, int index)
@@ -482,7 +482,7 @@ int main()
     IndexStudentSurname* rootSurname = nullptr;
     IndexStudentRating* rootRating = nullptr;
 
-    while (GetMenuAction("Продолжить работу", "Завершить работу", "Выберите действие: ") != 2)
+    while (GetMenuAction("Продолжить работу", "Завершить работу", "Выберите действие(никакой другой ввод обработан не будет и повлечёт бесконечный цикл: ") != 2)
     {
         switch (GetMenuAction("Создать массив самостоятельно", "Прочитать массив из файла", "Как получить исходный массив: "))
         {

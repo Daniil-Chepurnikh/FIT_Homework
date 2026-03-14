@@ -73,7 +73,7 @@ string ToString(Student stud)
     return stud.surname + " " + stud.name + " Рейтинг: " + to_string(CalculateRating(stud)) + '\n';
 }
 
-void PrintIter() // будет печатать по возрастанию
+void Print() // будет печатать по возрастанию
 {
     if (head == nullptr)
         cout << "Список пуст\n";
@@ -87,8 +87,6 @@ void PrintIter() // будет печатать по возрастанию
         }
     }
 }
-
-
 
 void InsertIter(Student* stud) // вставляет сортируя по фамилиям. фамилии уникальны
 {
